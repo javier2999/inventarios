@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DualCode - Sistema de Inventarios</title>
+    <link rel="icon" href="imagenes/favicon.ico.jpg">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Registration Screen -->
+    <section class="form-register" id="registrationScreen">
+        <h4>REGISTRO DUALCODE</h4>
+        <input class="controls" type="text" name="nombres" id="nombres" placeholder="Ingrese su nombres" required>
+        <input class="controls" type="text" name="apellidos" id="apellidos" placeholder="Ingrese su apellidos" required>
+        <input class="controls" type="email" name="correo" id="correo" placeholder="Ingrese su correo" required>
+        <input class="controls" type="password" name="contraseña" id="contraseña" placeholder="Ingrese su contraseña" required>
+        <p>Estoy de acuerdo con <a href="#">Términos y condiciones</a></p>
+        <input class="botons" type="button" value="Registrar" onclick="registrarYEntrar()">
+        <p><a href="#" onclick="mostrarLogin()">¿Ya tengo cuenta?</a></p>
+        <div id="registerMessage" class="mt-3"></div>
+    </section>
+
+    <!-- Login Screen -->
+    <section class="form-register d-none" id="loginScreen">
+        <h4>INICIAR SESIÓN</h4>
+        <input class="controls" type="email" name="loginCorreo" id="loginCorreo" placeholder="Ingrese su correo" required>
+        <input class="controls" type="password" name="loginContraseña" id="loginContraseña" placeholder="Ingrese su contraseña" required>
+        <input class="botons" type="button" value="Iniciar Sesión" onclick="login()">
+        <p><a href="#" onclick="mostrarRegistro()">¿No tienes cuenta? Regístrate</a></p>
+        <div id="loginMessage" class="mt-3"></div>
+    </section>
+
+    <!-- Main App -->
+    <div id="appScreen" class="container d-none">
+        <div class="dualcode-card p-4 my-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h1 class="glowing-text mb-0">DualCode</h1>
+                <div class="d-flex align-items-center gap-3 mt-2 mt-md-0">
+                    <div class="bg-primary bg-opacity-25 px-3 py-2 rounded">
+                        <span class="fw-bold">💰 Saldo: $<span id="userBalance">0</span></span>
+                    </div>
+                    <span id="userName" class="fw-bold"></span>
+                    <button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="dualcode-card p-4 mb-4">
+            <div class="d-flex flex-column flex-md-row gap-3 align-items-center">
+                <input type="number" class="form-control" id="balanceAmount" placeholder="Cantidad" min="0" style="max-width: 200px;">
+                <button class="btn btn-success" onclick="addBalance()">
+                    <i class="bi bi-plus-circle"></i> Agregar Saldo
+                </button>
+                <button class="btn btn-warning" onclick="subtractBalance()">
+                    <i class="bi bi-dash-circle"></i> Retirar Saldo
+                </button>
+            </div>
+        </div>
+
+        <ul class="nav nav-pills nav-fill mb-4" id="inventoryTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="electronics-tab" data-bs-toggle="tab" data-bs-target="#electronics" type="button" role="tab">
+                    <i class="bi bi-phone"></i> Electrónicos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab">
+                    <i class="bi bi-bag"></i> Productos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="food-tab" data-bs-toggle="tab" data-bs-target="#food" type="button" role="tab">
+                    <i class="bi bi-egg-fried"></i> Comida
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="movies-tab" data-bs-toggle="tab" data-bs-target="#movies" type="button" role="tab">
+                    <i class="bi bi-film"></i> Películas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom" type="button" role="tab">
+                    <i class="bi bi-star"></i> Personalizado
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="inventoryTabsContent">
+            <!-- Electronics Tab -->
+            <div class="tab-pane fade show active" id="electronics" role="tabpanel">
+                <div class="dualcode-card p-4 mb-4">
+                    <h2 class="mb-4"><i class="bi bi-phone"></i> Inventario de Electrónicos</h2>
+                    <div class="category-hint mb-3">
+                        <i class="bi bi-info-circle"></i> Ejemplos: teléfonos, computadoras, tablets, cámaras, audífonos
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="elecName" placeholder="Nombre del producto">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="url" class="form-control" id="elecImage" placeholder="URL de la imagen">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="elecPrice" placeholder="Precio" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="elecQuantity" placeholder="Cantidad" min="1" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn dualcode-gradient text-white w-100" onclick="addProduct('electronics')">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-4" id="electronicsGrid"></div>
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div class="tab-pane fade" id="products" role="tabpanel">
+                <div class="dualcode-card p-4 mb-4">
+                    <h2 class="mb-4"><i class="bi bi-bag"></i> Inventario de Productos</h2>
+                    <div class="category-hint mb-3">
+                        <i class="bi bi-info-circle"></i> Ejemplos: ropa, zapatos, accesorios, muebles, herramientas
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="prodName" placeholder="Nombre del producto">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="url" class="form-control" id="prodImage" placeholder="URL de la imagen">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="prodPrice" placeholder="Precio" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="prodQuantity" placeholder="Cantidad" min="1" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn dualcode-gradient text-white w-100" onclick="addProduct('products')">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-4" id="productsGrid"></div>
+                </div>
+            </div>
+
+            <!-- Food Tab -->
+            <div class="tab-pane fade" id="food" role="tabpanel">
+                <div class="dualcode-card p-4 mb-4">
+                    <h2 class="mb-4"><i class="bi bi-egg-fried"></i> Inventario de Comida</h2>
+                    <div class="category-hint mb-3">
+                        <i class="bi bi-info-circle"></i> Ejemplos: frutas, verduras, carnes, lácteos, snacks, bebidas
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="foodName" placeholder="Nombre del producto">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="url" class="form-control" id="foodImage" placeholder="URL de la imagen">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="foodPrice" placeholder="Precio" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="foodQuantity" placeholder="Cantidad" min="1" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn dualcode-gradient text-white w-100" onclick="addProduct('food')">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-4" id="foodGrid"></div>
+                </div>
+            </div>
+
+            <!-- Movies Tab -->
+            <div class="tab-pane fade" id="movies" role="tabpanel">
+                <div class="dualcode-card p-4 mb-4">
+                    <h2 class="mb-4"><i class="bi bi-film"></i> Inventario de Películas</h2>
+                    <div class="category-hint mb-3">
+                        <i class="bi bi-info-circle"></i> Ejemplos: películas, series, documentales, cortometrajes
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="movName" placeholder="Nombre de la película">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="url" class="form-control" id="movImage" placeholder="URL del póster">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="movPrice" placeholder="Precio" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="movQuantity" placeholder="Cantidad" min="1" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn dualcode-gradient text-white w-100" onclick="addProduct('movies')">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-4" id="moviesGrid"></div>
+                </div>
+            </div>
+
+            <!-- Custom Tab -->
+            <div class="tab-pane fade" id="custom" role="tabpanel">
+                <div class="dualcode-card p-4 mb-4">
+                    <h2 class="mb-4"><i class="bi bi-star"></i> Tu Inventario Personalizado</h2>
+                    <div class="category-hint mb-3">
+                        <i class="bi bi-info-circle"></i> Aquí puedes agregar cualquier tipo de producto
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="custName" placeholder="Nombre del artículo">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="url" class="form-control" id="custImage" placeholder="URL de la imagen">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="custPrice" placeholder="Precio" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="custQuantity" placeholder="Cantidad" min="1" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn dualcode-gradient text-white w-100" onclick="addProduct('custom')">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-4" id="customGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Variables globales
+        let users = JSON.parse(localStorage.getItem('dualcode_users')) || {};
+        let currentUser = null;
+        let inventory = JSON.parse(localStorage.getItem('dualcode_inventory')) || {
+            electronics: [],
+            products: [],
+            food: [],
+            movies: [],
+            custom: []
+        };
+
+        // Función para guardar datos
+        function saveData() {
+            localStorage.setItem('dualcode_users', JSON.stringify(users));
+            localStorage.setItem('dualcode_inventory', JSON.stringify(inventory));
+        }
+
+        // Funciones para mostrar/ocultar formularios
+        function mostrarLogin() {
+            document.getElementById('registrationScreen').classList.add('d-none');
+            document.getElementById('loginScreen').classList.remove('d-none');
+        }
+
+        function mostrarRegistro() {
+            document.getElementById('loginScreen').classList.add('d-none');
+            document.getElementById('registrationScreen').classList.remove('d-none');
+        }
+
+        // Función de registro
+        function registrarYEntrar() {
+            const name = document.getElementById('nombres').value + ' ' + document.getElementById('apellidos').value;
+            const email = document.getElementById('correo').value;
+            const password = document.getElementById('contraseña').value;
+            const msgEl = document.getElementById('registerMessage');
+
+            if (!name.trim() || !email || !password) {
+                msgEl.innerHTML = '<div class="alert alert-danger">Por favor completa todos los campos</div>';
+                return;
+            }
+
+            if (users[email]) {
+                msgEl.innerHTML = '<div class="alert alert-danger">Este usuario ya existe</div>';
+                return;
+            }
+
+            // Registrar usuario
+            users[email] = { 
+                name: name.trim(), 
+                email: email,
+                password: password, 
+                balance: 1000
+            };
+            
+            saveData();
+            
+            // Iniciar sesión y mostrar aplicación
+            currentUser = email;
+            document.getElementById('registrationScreen').classList.add('d-none');
+            document.getElementById('appScreen').classList.remove('d-none');
+            document.getElementById('userName').textContent = users[email].name;
+            updateBalance();
+            renderAllInventories();
+            
+            showNotification('🎉 ¡Registro exitoso! Bienvenido a DualCode', 'success');
+        }
+
+        // Función de login
+        function login() {
+            const email = document.getElementById('loginCorreo').value;
+            const password = document.getElementById('loginContraseña').value;
+            const msgEl = document.getElementById('loginMessage');
+
+            if (!users[email]) {
+                msgEl.innerHTML = '<div class="alert alert-danger">Usuario no encontrado</div>';
+                return;
+            }
+
+            if (users[email].password !== password) {
+                msgEl.innerHTML = '<div class="alert alert-danger">Contraseña incorrecta</div>';
+                return;
+            }
+
+            currentUser = email;
+            document.getElementById('loginScreen').classList.add('d-none');
+            document.getElementById('appScreen').classList.remove('d-none');
+            document.getElementById('userName').textContent = users[email].name;
+            updateBalance();
+            renderAllInventories();
+            
+            showNotification('👋 ¡Bienvenido de nuevo!', 'success');
+        }
+
+        // Función de logout
+        function logout() {
+            currentUser = null;
+            document.getElementById('appScreen').classList.add('d-none');
+            document.getElementById('registrationScreen').classList.remove('d-none');
+            // Limpiar formularios
+            document.getElementById('loginCorreo').value = '';
+            document.getElementById('loginContraseña').value = '';
+            document.getElementById('nombres').value = '';
+            document.getElementById('apellidos').value = '';
+            document.getElementById('correo').value = '';
+            document.getElementById('contraseña').value = '';
+        }
+
+        // Funciones del sistema de inventarios
+        function updateBalance() {
+            if (currentUser && users[currentUser]) {
+                document.getElementById('userBalance').textContent = users[currentUser].balance.toFixed(2);
+            }
+        }
+
+        function addBalance() {
+            const amount = parseFloat(document.getElementById('balanceAmount').value);
+            if (amount > 0 && currentUser) {
+                users[currentUser].balance += amount;
+                updateBalance();
+                saveData();
+                showNotification('💰 Saldo agregado exitosamente', 'success');
+                document.getElementById('balanceAmount').value = '';
+            }
+        }
+
+        function subtractBalance() {
+            const amount = parseFloat(document.getElementById('balanceAmount').value);
+            if (amount > 0 && currentUser && users[currentUser].balance >= amount) {
+                users[currentUser].balance -= amount;
+                updateBalance();
+                saveData();
+                showNotification('💸 Saldo retirado exitosamente', 'success');
+                document.getElementById('balanceAmount').value = '';
+            } else {
+                showNotification('❌ Fondos insuficientes', 'danger');
+            }
+        }
+
+        // Patrones de validación para cada categoría
+        const categoryPatterns = {
+            electronics: [
+                /teléfono|telefono|celular|smartphone|móvil|movil|iphone|samsung|xiaomi|huawei|computadora|pc|laptop|tablet|ipad|cámara|camara|audífono|audifono|auricular|headphone|consola|playstation|xbox|nintendo|televisor|tv|monitor|impresora|router|modem/i
+            ],
+            products: [
+                /ropa|camiseta|pantalón|pantalon|zapato|tenis|bolso|mochila|accesorio|reloj|joya|anillo|collar|mueble|silla|mesa|cama|sofá|sofa|herramienta|martillo|destornillador|taladro|libro|cuaderno|lápiz|lapiz|juguete|peluche|deporte|balón|balon|raqueta/i
+            ],
+            food: [
+                /comida|alimento|fruta|manzana|naranja|plátano|platano|uva|fresa|verdura|lechuga|tomate|zanahoria|papa|cebolla|carne|pollo|res|cerdo|pescado|marisco|lácteo|leche|queso|yogur|mantequilla|pan|torta|pastel|galleta|snack|chocolate|dulce|bebida|agua|refresco|jugo|zumo|café|cafe|té|te/i
+            ],
+            movies: [
+                /película|pelicula|film|serie|documental|cortometraje|animación|animacion|dvd|bluray|netflix|hbo|disney|amazon|prime|video|streaming|actor|actriz|director|guion|oscar|premio|cinema|cine|teatro|tráiler|trailer|banda sonora|soundtrack/i
+            ],
+            custom: []
+        };
+
+        function isValidForCategory(category, productName) {
+            if (category === 'custom') return true;
+            
+            const patterns = categoryPatterns[category];
+            return patterns.some(pattern => pattern.test(productName.toLowerCase()));
+        }
+
+        function addProduct(category) {
+            const prefixes = { 
+                electronics: 'elec', 
+                products: 'prod', 
+                food: 'food',
+                movies: 'mov', 
+                custom: 'cust' 
+            };
+            const prefix = prefixes[category];
+           
+            const name = document.getElementById(prefix + 'Name').value;
+            const image = document.getElementById(prefix + 'Image').value;
+            const price = parseFloat(document.getElementById(prefix + 'Price').value);
+            const quantity = parseInt(document.getElementById(prefix + 'Quantity').value);
+
+            if (!name || !image || !price || !quantity) {
+                showNotification('⚠️ Por favor completa todos los campos', 'danger');
+                return;
+            }
+
+            if (!isValidForCategory(category, name)) {
+                showNotification(`❌ Este artículo no corresponde a la categoría "${getCategoryName(category)}". Por favor verifica.`, 'danger');
+                return;
+            }
+
+            const product = {
+                id: Date.now(),
+                name,
+                image,
+                price,
+                quantity,
+                sold: false
+            };
+
+            inventory[category].push(product);
+            saveData();
+            renderInventory(category);
+           
+            document.getElementById(prefix + 'Name').value = '';
+            document.getElementById(prefix + 'Image').value = '';
+            document.getElementById(prefix + 'Price').value = '';
+            document.getElementById(prefix + 'Quantity').value = '1';
+           
+            showNotification('✅ Producto agregado al inventario', 'success');
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                electronics: 'Electrónicos',
+                products: 'Productos',
+                food: 'Comida',
+                movies: 'Películas',
+                custom: 'Personalizado'
+            };
+            return names[category];
+        }
+
+        function buyProduct(category, id, quantity = 1) {
+            const product = inventory[category].find(p => p.id === id);
+            if (product.quantity < quantity) {
+                showNotification('❌ No hay suficiente stock disponible', 'danger');
+                return;
+            }
+
+            const totalPrice = product.price * quantity;
+            if (users[currentUser].balance >= totalPrice) {
+                users[currentUser].balance -= totalPrice;
+                product.quantity -= quantity;
+                updateBalance();
+                saveData();
+                renderInventory(category);
+                showNotification(`🎉 ¡Has comprado ${quantity} ${product.name}!`, 'success');
+                
+                if (product.quantity <= 0) {
+                    inventory[category] = inventory[category].filter(p => p.id !== id);
+                    saveData();
+                    renderInventory(category);
+                }
+            } else {
+                showNotification('❌ Fondos insuficientes', 'danger');
+            }
+        }
+
+        function deleteProduct(category, id) {
+            inventory[category] = inventory[category].filter(p => p.id !== id);
+            saveData();
+            renderInventory(category);
+            showNotification('🗑️ Producto eliminado', 'success');
+        }
+
+        function renderInventory(category) {
+            const gridIds = { 
+                electronics: 'electronicsGrid', 
+                products: 'productsGrid', 
+                food: 'foodGrid',
+                movies: 'moviesGrid', 
+                custom: 'customGrid' 
+            };
+            const grid = document.getElementById(gridIds[category]);
+           
+            grid.innerHTML = inventory[category].map(product => `
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <div class="dualcode-card h-100 position-relative">
+                        <span class="badge bg-info stock-badge">Stock: ${product.quantity}</span>
+                        <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/250x200?text=Sin+Imagen'">
+                        <div class="card-body">
+                            <h5 class="card-title">${product.name}</h5>
+                            <p class="card-text text-warning fw-bold">$${product.price.toFixed(2)}</p>
+                            
+                            <div class="quantity-control">
+                                <button class="btn btn-outline-secondary quantity-btn" onclick="decreaseQuantity('${category}', ${product.id})">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                <input type="number" id="quantity-${category}-${product.id}" class="form-control quantity-input" value="1" min="1" max="${product.quantity}">
+                                <button class="btn btn-outline-secondary quantity-btn" onclick="increaseQuantity('${category}', ${product.id})">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-success flex-fill" onclick="buyProduct('${category}', ${product.id}, parseInt(document.getElementById('quantity-${category}-${product.id}').value))">
+                                    <i class="bi bi-cart-plus"></i> Comprar
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteProduct('${category}', ${product.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function increaseQuantity(category, id) {
+            const product = inventory[category].find(p => p.id === id);
+            const input = document.getElementById(`quantity-${category}-${id}`);
+            if (parseInt(input.value) < product.quantity) {
+                input.value = parseInt(input.value) + 1;
+            }
+        }
+
+        function decreaseQuantity(category, id) {
+            const input = document.getElementById(`quantity-${category}-${id}`);
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+        function renderAllInventories() {
+            renderInventory('electronics');
+            renderInventory('products');
+            renderInventory('food');
+            renderInventory('movies');
+            renderInventory('custom');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} notification`;
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        // Cargar inventario al iniciar si hay usuario activo
+        window.addEventListener('DOMContentLoaded', () => {
+            if (currentUser) {
+                renderAllInventories();
+            }
+        });
+    </script>
+</body>
+</html>
